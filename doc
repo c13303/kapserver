@@ -1,0 +1,32 @@
+
+ws.session. ==================================
+
+deck = full player deck
+ennemyDeck = full ennemy deck
+hand = 6 cards from deck in player hand
+ennemyHand = 6 cards of ennemy
+duelTurn
+duelmode
+busy
+duelPlayerToPlay
+
+                
+
+
+
+
+
+Life : Ta Resistance au combat. Mourir = perdre une carte au choix de l'ennemi.
+Sex : Resistance Sex. Sex Supérieur >= Vue sur les stats de l'ennemi
+Karma : Resistance Karma. Karma >= First to Attack
+Sanity: Resistance Sanity. Sanity >= More Luck (?)
+
+Effect table
+
+
+SEX > KARMA > SAN > ...
+
+        SEX      KAR      SAN
+SEX     1         2         -1
+KAR     -1        1          2
+SAN     2         -1         1
