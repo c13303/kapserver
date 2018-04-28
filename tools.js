@@ -43,7 +43,7 @@ module.exports = {
         }        
         return({startX : startX ,startY : startY ,endX : endX ,endY : endY});        
     },
-    getNextCase: function (Tx, Ty, x,y) {
+    getNextCase: function (Tx, Ty, x,y) { /* the true one, of course */
        
         var nextX;
         var nextY;
@@ -92,6 +92,19 @@ module.exports = {
        var array = [nextX,nextY];
        return(array);
     },
+    getDirection: function(x,y,nextX,nextY){
+        var direction = 0;
+        if (nextX === x && nextY === y) direction = 0;
+        if (nextX > x && nextY === y) direction = 1;
+        if (nextX > x && nextY < y) direction = 2;
+        if (nextX === x && nextY < y) direction = 3;
+        if (nextX < x && nextY < y) direction = 4;
+        if (nextX < x && nextY === y) direction = 5;
+        if (nextX < x && nextY > y) direction = 6;
+        if (nextX === x && nextY > y) direction = 7;
+        if (nextX > x && nextY > y) direction = 8;
+        return(direction);
+    }
    
 
 };

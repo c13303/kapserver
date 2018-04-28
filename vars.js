@@ -1,6 +1,6 @@
 /* file created by charles.torris@gmail.com */
 module.exports = {
- MapVersion : 5,
+ MapVersion : 2,
  movespeed : 200, //ms
  diagonals : 1,
  chunksize : 16,
