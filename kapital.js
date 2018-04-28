@@ -43,7 +43,8 @@ stdin.addListener("data", function (d) {
         }
         
         if (commande === 'debug') {
-            console.log(people.players[1]);
+            console.log(people.players[1]);            
+            console.log(people.players[2]);
             console.log(people.players[3]);
         }
     }
@@ -75,42 +76,56 @@ function move(gid,Tx,Ty,ws=null){
              
             /* MOVER ORDER */
             people.players[gid].isMoving = true;
+            
+            /* save old position */
+            people.players[gid].Ox = people.players[gid].x;
+            people.players[gid].Oy = people.players[gid].y;
+                       
+            /* set long term target position */
             people.players[gid].Tx = Tx;
             people.players[gid].Ty = Ty;
-            var arr = tools.getNextCase(Tx, Ty, people.players[gid].x, people.players[gid].y); // calculate next step
+            
+            /* calculate next step */
+            var arr = tools.getNextCase(Tx, Ty, people.players[gid].x, people.players[gid].y); 
             var nextX = arr[0];
             var nextY = arr[1];     
             
-            /* if problem, abort now TODO */                   
+            
+            /* if problem, abort now TODO */  
+            
+            
            
             /* CHUNK CHECK & CHANGE */
             var NewChunk = tools.getChunk(nextX, nextY);
             if (NewChunk.x !== people.players[gid].chunkX || NewChunk.y !== people.players[gid].chunkY) {
                 people.players[gid].chunkX = NewChunk.x;
                 people.players[gid].chunkY = NewChunk.y;                
-                /* if ws, update for yourself */
+                /* if client connected, update for yourself */
                 if(ws){
                      ws.UpdateMyClientZone();
                 }
             }
             
-            /* tell everyone you moved */            
+            /* save data */
             var direction = tools.getDirection(people.players[gid].x,people.players[gid].y,Tx,Ty);            
             people.players[gid].x = nextX;
             people.players[gid].y = nextY;
             people.players[gid].direction = direction;            
             
-          
+            
+           /* tell everyone you moved */   
             var selected = [people.players[gid]];
             clients.tellEveryClient(selected,gid,people);
             
             /* MOVE COMPLETE */
-            people.players[gid].moveTimer = setTimeout(function () {  
+            setTimeout(function () {  
                 people.players[gid].isMoving = null;
+                people.players[gid].Ox = null;
+                people.players[gid].Oy = null;
             }, v.movespeed);
 
         } else {
-            console.log('refused move instruction : too quick');
+            console.log(gid + ' refused move instruction : too quick');
         }
 
 }
@@ -188,14 +203,7 @@ wss.on('connection', function aconnection(ws, req) {
     ws.gid = req.user.gid;
     ws.id = req.user.id; /* SQL id */
     
-    /*
-     * WE ALL RELY TO PEOPLE
-    people.players[ws.gid].name = req.user.id;
-    people.players[ws.gid].x = req.user.x;
-    people.players[ws.gid].y = req.user.y;    
-    people.players[ws.gid].name = req.user.name;
-    people.players[ws.gid].direction = req.user.direction;
-    */
+
 
     /* send GID + map version to client */
     try {
@@ -222,7 +230,7 @@ wss.on('connection', function aconnection(ws, req) {
            var peopleInZone = people.getPeopleInZone(zone,ws.gid);
             var fullJdata = {"UpdateMyZone": peopleInZone};
             ws.send(JSON.stringify(fullJdata));
-            console.log(ws.gid + '< UpdateMyZone Full (chunk change) : ' + peopleInZone.length + ' people received');
+            // console.log(ws.gid + '< UpdateMyZone Full (chunk change) : ' + peopleInZone.length + ' people received');
        } else { // array given of people (already filtered zone for the client */  
            var fullJdata = {"UpdateMyZone": peopleArray};
             ws.send(JSON.stringify(fullJdata));
@@ -246,8 +254,8 @@ wss.on('connection', function aconnection(ws, req) {
     /* INIT GAME FOR PLAYER */
 
     var Chunk = tools.getChunk(people.players[ws.gid].x, people.players[ws.gid].y);
-    ws.chunkX = Chunk.x;
-    ws.chunkY = Chunk.y;
+    people.players[ws.gid].chunkX = Chunk.x;
+    people.players[ws.gid].chunkY = Chunk.y;
     ws.UpdateMyClientZone();
     clients.clients.push(ws);
 
@@ -280,7 +288,6 @@ wss.on('connection', function aconnection(ws, req) {
 
             /* player move */
             if (data.move) {
-                //console.log(ws.gid+' moves to '+data.x+','+data.y);
                  move(ws.gid,data.x,data.y,ws);
             }
 

@@ -1,6 +1,10 @@
 /* Chien Games ALL RIGHTS RESERVED */
 var v = require('./vars.js');
 module.exports = {
+    getZoneDiff : function(oldZone,newZone){
+        
+        
+    },
     isInZone : function(x,y,zone){
         if(x >= zone.startX && x <= zone.endX &&
              y >= zone.startY && y <= zone.endY   ){
