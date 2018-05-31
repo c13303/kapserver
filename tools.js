@@ -1,58 +1,80 @@
 /* Chien Games ALL RIGHTS RESERVED */
 var v = require('./vars.js');
 module.exports = {
-    getZoneDiff : function(oldZone,newZone){
-        
-        
+    getRandomInt: function (max) {
+        return Math.floor(Math.random() * Math.floor(max));
     },
-    isInZone : function(x,y,zone){
-        if(x >= zone.startX && x <= zone.endX &&
-             y >= zone.startY && y <= zone.endY   ){
-         return true;
-        }else{
+    getZoneDiff: function (oldZone, newZone) {
+
+
+    },
+    isInZone: function (x, y, zone) {
+        if (x >= zone.startX && x <= zone.endX &&
+                y >= zone.startY && y <= zone.endY) {
+            return true;
+        } else {
             return false;
         }
     },
-    getZone : function(x,y){ // get zone by x,y
-        var chunk = this.getChunk(x,y);
-        var zone = this.getChunkZone(chunk.x,chunk.y);
+    getZone: function (x, y) { // get zone by x,y
+        var chunk = this.getChunk(x, y);
+        var zone = this.getChunkZone(chunk.x, chunk.y);
         return(zone);
     },
-    getChunk :  function(x,y) 
+    getNineChunks : function(cX,cY){
+        
+        var maxChunk = v.maxTiles / v.chunksize;
+        
+        var firstChunkX = cX - 1;
+        var firstChunkY = cY - 1;
+        var lastChunkX = cX + 1;
+        var lastChunkY = cY + 1
+
+        if (firstChunkX < 0)
+            firstChunkX = 0;
+        if (firstChunkX > maxChunk)
+            firstChunkX = maxChunk;
+        if (firstChunkY < 0)
+            firstChunkY = 0;
+        if (firstChunkY > maxChunk)
+            firstChunkY = maxChunk;
+
+        if (firstChunkY < 0)
+            firstChunkY = 0;
+        if (firstChunkY > maxChunk)
+            firstChunkY = maxChunk;
+        if (firstChunkY < 0)
+            firstChunkY = 0;
+        if (firstChunkY > maxChunk)
+            firstChunkY = maxChunk;
+        
+        return({firstChunkX: firstChunkX,lastChunkX:lastChunkX,firstChunkY:firstChunkY,lastChunkY:lastChunkY});
+        
+    },
+    getChunk: function (x, y)
     {
         var chunkX = parseInt(x / v.chunksize);
         var chunkY = parseInt(y / v.chunksize);
-        var result = {x:chunkX,y:chunkY};
+        var result = {x: chunkX, y: chunkY};
         return(result);
     },
-    getChunkZone : function(cX,cY) // get zone by chunk
+    getChunkZone: function (cX, cY) // get zone by chunk
     {
-        var startX=0;
-        var startY=0;
-        var endX=v.chunksize * 3;
-        var endY=v.chunksize * 3;
-        var lastChunk = v.maxTiles / v.chunksize;     
-       
-        if(cX>0){
-            startX = (cX - 1) * v.chunksize;
-        }  
-        if(cY>0){
-            startY = (cY -1) * v.chunksize;
-        }
-        if(cX < lastChunk){ // +2 because include current chunk
-            endX = (cX + 2) * v.chunksize;
-        }
-        if(cY < lastChunk){
-            endY = (cY + 2) * v.chunksize;
-        }        
-        return({startX : startX ,startY : startY ,endX : endX ,endY : endY});        
+        var chunk9 = this.getNineChunks(cX,cY);
+
+        var startX = chunk9.firstChunkX * v.chunksize;
+        var startY = chunk9.firstChunkY * v.chunksize;
+        var endX = (chunk9.lastChunkX + 1) * v.chunksize;
+        var endY = (chunk9.lastChunkY + 1) * v.chunksize;
+
+        return({startX: startX, startY: startY, endX: endX, endY: endY});
     },
-    getNextCase: function (Tx, Ty, x,y) { /* the true one, of course */
-       
+    getNextCase: function (Tx, Ty, x, y) { /* the true one, of course */
+
         var nextX;
         var nextY;
-        
-       /* DIAGONALS OR NOT */
+
+        /* DIAGONALS OR NOT */
         if (!v.diagonals) {
             nextX = x;
             nextY = y;
@@ -75,7 +97,7 @@ module.exports = {
                     nextY = y - 1;
                 }
             }
-        } else {  
+        } else {
             nextX = x;
             nextY = y;
             if (Tx > x) {
@@ -92,24 +114,37 @@ module.exports = {
                 nextY = y - 1;
             }
         }
-       
-       var array = [nextX,nextY];
-       return(array);
+        if(nextX < 0) nextX = 0;
+        if(nextY < 0) nextY = 0;
+        if(nextX >= v.maxTiles) nextX = v.maxTiles-1;
+        if(nextY >= v.maxTiles) nextY = v.maxTiles-1;
+        
+        var array = [nextX, nextY];
+        return(array);
     },
-    getDirection: function(x,y,nextX,nextY){
+    getDirection: function (x, y, nextX, nextY) {
         var direction = 0;
-        if (nextX === x && nextY === y) direction = 0;
-        if (nextX > x && nextY === y) direction = 1;
-        if (nextX > x && nextY < y) direction = 2;
-        if (nextX === x && nextY < y) direction = 3;
-        if (nextX < x && nextY < y) direction = 4;
-        if (nextX < x && nextY === y) direction = 5;
-        if (nextX < x && nextY > y) direction = 6;
-        if (nextX === x && nextY > y) direction = 7;
-        if (nextX > x && nextY > y) direction = 8;
+        if (nextX === x && nextY === y)
+            direction = 0;
+        if (nextX > x && nextY === y)
+            direction = 1;
+        if (nextX > x && nextY < y)
+            direction = 2;
+        if (nextX === x && nextY < y)
+            direction = 3;
+        if (nextX < x && nextY < y)
+            direction = 4;
+        if (nextX < x && nextY === y)
+            direction = 5;
+        if (nextX < x && nextY > y)
+            direction = 6;
+        if (nextX === x && nextY > y)
+            direction = 7;
+        if (nextX > x && nextY > y)
+            direction = 8;
         return(direction);
     }
-   
+
 
 };
 
